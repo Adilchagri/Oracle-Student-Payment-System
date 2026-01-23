@@ -390,7 +390,7 @@ python -m tests.test_queries
       <a href="https://github.com/adilchagri">GitHub</a>
     </td>
     <td align="center">
-      <img src="https://github.com/jbelchouaib.png" width="100px;" alt="Jbel CHOUAIB"/><br />
+      <img src="https://github.com/choua1b.png" width="100px;" alt="Jbel CHOUAIB"/><br />
       <sub><b>Jbel CHOUAIB</b></sub><br />
       <a href="https://github.com/choua1b">GitHub</a>
     </td>
