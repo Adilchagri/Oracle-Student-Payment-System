@@ -1,136 +1,156 @@
-🎓 Système Intelligent de Suivi des Paiements & Analyse de Risque
+# 🎓 Oracle Student Payment System  
+### A Modern Database-Driven Student Payment Management Platform
 
-Une solution complète de gestion de scolarité (ERP) capable de gérer le cycle de vie étudiant, d'automatiser la comptabilité et de détecter proactivement les risques d'impayés grâce à un moteur PL/SQL puissant.
+![Oracle](https://img.shields.io/badge/Database-Oracle-red)
+![Python](https://img.shields.io/badge/Python-3.x-blue)
+![Streamlit](https://img.shields.io/badge/UI-Streamlit-ff4b4b)
+![PLSQL](https://img.shields.io/badge/PL%2FSQL-Advanced-green)
 
-🚀 Fonctionnalités Clés
+---
 
-1. Gestion Administrative Avancée
+## 🚀 Overview
 
-Structure Académique : Gestion hiérarchique (Départements ➝ Filières ➝ Étudiants).
+**Oracle Student Payment System** is a full-stack academic payment management platform designed to handle **student registration, payment tracking, financial risk analysis, and automated workflows** using **Oracle Database** and **PL/SQL**, with a modern **Streamlit-based Python interface**.
 
-Inscription Intelligente : Formulaire dynamique avec filtrage automatique des filières par département.
+This project demonstrates **advanced database design**, **business logic automation**, and **real-world ERP-style architecture**, making it ideal for academic, enterprise, or portfolio use.
 
-Transaction Atomique : Création simultanée de l'étudiant et de son échéancier financier (garantie d'intégrité).
+---
 
-2. Automatisation Financière (PL/SQL)
+## ✨ Key Features
 
-Suivi Temps Réel : Mise à jour automatique des statuts des factures (PENDING → PARTIAL → PAID) via des Triggers Composés.
+### 👨‍🎓 Student Management
+- Register and manage student profiles
+- Track academic and financial information
+- Secure relational data modeling
 
-Sécurité Comptable : L'agent de saisie n'a aucun accès manuel aux statuts, éliminant les erreurs humaines.
+### 💳 Payment Processing
+- Record and validate student payments
+- Automatic payment status updates (PAID / PENDING)
+- Receipt generation logic
 
-Reçus PDF : Génération automatique de reçus de paiement téléchargeables.
+### ⚙️ Business Logic Automation (PL/SQL)
+- Triggers to enforce data integrity
+- Stored procedures for payment workflows
+- Scheduled jobs for periodic financial checks
 
-3. Intelligence Artificielle & Risques
+### 📊 Risk & Monitoring Dashboard
+- Identify unpaid or late payments
+- Financial risk indicators
+- Real-time data visualization using Streamlit
 
-Batch Nocturne : Un job planifié (Oracle Scheduler) scanne la base chaque nuit pour détecter les retards.
+### 🐳 Dockerized Oracle Environment
+- Oracle 19c container for easy setup
+- Reproducible local development environment
 
-Alerting : Génération automatique d'alertes de risque dans une table d'audit.
+---
 
-Score de Risque : Classification automatique des étudiants (CRITICAL / MEDIUM / LOW).
+## 🏗️ Architecture
 
-4. Business Intelligence (Dashboard)
+```
+Frontend (Streamlit - Python)
+        │
+        ▼
+Oracle Database (19c)
+        │
+        ├── Tables & Constraints
+        ├── Triggers
+        ├── Stored Procedures
+        └── Scheduled Jobs
+```
 
-KPI Financiers : Taux de recouvrement, dette globale, projections de rentrées.
+---
 
-Visualisation : Graphiques interactifs par département et par statut.
+## 🛠️ Tech Stack
 
-Dossier 360° : Vue complète de l'historique d'un étudiant (Paiements, Factures, Alertes).
+| Layer        | Technology |
+|--------------|------------|
+| Database     | Oracle 19c |
+| Backend Logic| PL/SQL |
+| Frontend     | Streamlit (Python) |
+| DB Connector | python-oracledb |
+| DevOps       | Docker |
+| Language     | Python 3 |
 
-🛠️ Architecture Technique
+---
 
-Ce projet repose sur une architecture conteneurisée moderne :
+## 📂 Project Structure
 
-Composant
-
-Technologie
-
-Rôle
-
-Database
-
-Oracle 19c (Enterprise)
-
-Hébergement des données, PL/SQL, Jobs
-
-Conteneur
-
-Docker
-
-Virtualisation et isolation de l'environnement
-
-Backend Logic
-
-PL/SQL
-
-Triggers, Procédures Stockées, Vues Matérialisées
-
-Frontend
-
-Python (Streamlit)
-
-Interface Utilisateur, Graphiques, Génération PDF
-
-Driver
-
-python-oracledb
-
-Connectivité optimisée (Mode Thin UTF-8)
-
-📦 Installation & Démarrage
-
-1. Prérequis
-
-Docker Desktop ou Engine installé.
-
-Python 3.8+ installé.
-
-2. Démarrer le Serveur de Base de Données
-
-docker run -d -p 1521:1521 --name oracle19c -e ORACLE_PWD=password123 doctorkirk/oracle-19c
-
-
-3. Initialiser la Base de Données
-
-Connectez-vous (via SQL*Plus ou DBeaver) et exécutez le script d'initialisation complet :
-
-@database/setup_database.sql
-
-
-(Ce script crée les tables, triggers, procédures, jobs et insère les données de référence).
-
-4. Lancer l'Application Web
-
-# Installer les dépendances
-pip install -r requirements.txt
-
-# Lancer le serveur Streamlit
-streamlit run app/app.py
-
-
-📍 Accès : L'application sera disponible sur http://localhost:8501.
-
-📂 Structure du Projet
-
-Projet_Oracle_Paiement/
+```
+Oracle-Student-Payment-System/
 ├── app/
-│   ├── app.py              # Application Streamlit (Interface Principale)
-│   └── fix_data.py         # Script utilitaire de correction d'encodage
+│   ├── app.py
+│   └── fix_data.py
+│
 ├── database/
-│   └── setup_database.sql  # Script SQL Master (DDL + PL/SQL + Data)
+│   └── setup_database.sql
+│
 ├── docs/
-│   └── Rapport_Projet.pdf  # Documentation technique et fonctionnelle
-├── requirements.txt        # Liste des dépendances Python
-└── README.md               # Documentation du dépôt
+│   └── Rapport_Projet.pdf
+│
+├── requirements.txt
+└── README.md
+```
 
+---
 
-👥 Auteurs
+## ⚡ Installation & Setup
 
-Ce projet a été réalisé dans le cadre du Master IA (Université Sultan Moulay Slimane).
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/Adilchagri/Oracle-Student-Payment-System.git
+cd Oracle-Student-Payment-System
+```
 
-Adil CHAGRI (@Adilchagri)
+### 2️⃣ Setup Oracle Database
+- Run Oracle 19c using Docker
+- Execute `setup_database.sql` to initialize schema and logic
 
-Jbel CHOUAIB
+### 3️⃣ Install Python Dependencies
+```bash
+pip install -r requirements.txt
+```
 
-Encadrant : M. Youness KHOURDIFI
+### 4️⃣ Run the Application
+```bash
+streamlit run app/app.py
+```
 
-"L'automatisation est la clé de la fiabilité financière."
+---
+
+## 🎯 Use Cases
+
+- University or school payment management
+- ERP / academic system prototypes
+- Learning advanced PL/SQL & Oracle
+- Database-driven application demos
+- Backend / database portfolio project
+
+---
+
+## 📈 Future Enhancements
+
+- 🔐 Authentication & role-based access
+- 📄 PDF invoice generation
+- 📊 Advanced BI dashboards
+- 🌐 REST API layer
+- ☁️ Cloud deployment (OCI / AWS)
+
+---
+
+## 📄 Documentation
+
+Detailed technical documentation is available in:
+
+📘 `docs/Rapport_Projet.pdf`
+
+---
+
+## 👨‍💻 Author
+
+**Adil Chagri**  
+Database & Backend Enthusiast  
+Oracle • PL/SQL • Python  
+
+---
+
+⭐ If you like this project, don’t forget to **star the repository**!
