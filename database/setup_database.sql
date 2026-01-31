@@ -1,29 +1,40 @@
 --------------------------------------------------------------------------------
 -- PROJET: SYSTEME DE GESTION DES PAIEMENTS (ORACLE 19c)
--- AUTEURS: Adil CHAGRI & Jbel CHOUAIB
+-- AUTEURS: Adil CHAGRI & Chouaib JBEL
 -- DATE: Janvier 2026
 --------------------------------------------------------------------------------
 
--- 1. NETTOYAGE (Pour repartir a zero si besoin)
+-- 1. NETTOYAGE (Ordre inverse des dépendances)
 BEGIN
     EXECUTE IMMEDIATE 'DROP VIEW VIEW_RISK_DASHBOARD';
     EXECUTE IMMEDIATE 'DROP TABLE RISK_ALERTS CASCADE CONSTRAINTS';
     EXECUTE IMMEDIATE 'DROP TABLE PAYMENTS CASCADE CONSTRAINTS';
     EXECUTE IMMEDIATE 'DROP TABLE INSTALLMENTS CASCADE CONSTRAINTS';
     EXECUTE IMMEDIATE 'DROP TABLE STUDENTS CASCADE CONSTRAINTS';
+    EXECUTE IMMEDIATE 'DROP TABLE DEPARTMENTS CASCADE CONSTRAINTS';
 EXCEPTION
-    WHEN OTHERS THEN NULL; -- Ignore les erreurs si les tables n'existent pas
+    WHEN OTHERS THEN NULL;
 END;
 /
 
 -- 2. CREATION DES TABLES (DDL)
+
+-- Nouvelle table pour les filières
+CREATE TABLE DEPARTMENTS (
+    dept_id      NUMBER(3)       CONSTRAINT pk_depts PRIMARY KEY,
+    dept_name    VARCHAR2(100)   NOT NULL,
+    description  VARCHAR2(255)
+);
+
 CREATE TABLE STUDENTS (
     student_id      NUMBER(5)       CONSTRAINT pk_students PRIMARY KEY,
     name            VARCHAR2(100)   NOT NULL,
     email           VARCHAR2(100),
     phone           VARCHAR2(20),
+    dept_id         NUMBER(3),      -- Lien vers le département
     total_tuition   NUMBER(10,2)    NOT NULL,
-    enrollment_date DATE            DEFAULT SYSDATE
+    enrollment_date DATE            DEFAULT SYSDATE,
+    CONSTRAINT fk_std_dept FOREIGN KEY (dept_id) REFERENCES DEPARTMENTS(dept_id)
 );
 
 CREATE TABLE INSTALLMENTS (
@@ -53,7 +64,19 @@ CREATE TABLE RISK_ALERTS (
     CONSTRAINT fk_alert_student FOREIGN KEY (student_id) REFERENCES STUDENTS(student_id)
 );
 
--- 3. TRIGGER (Gestion Automatique des Paiements)
+-- 3. INSERTIONS INITIALES (Données de test)
+INSERT INTO DEPARTMENTS VALUES (1, 'Intelligence Artificielle', 'Parcours Excellence IA');
+INSERT INTO DEPARTMENTS VALUES (2, 'Informatique', 'Génie Logiciel et Développement');
+INSERT INTO DEPARTMENTS VALUES (3, 'Multimédia', 'Conception Web et Design');
+
+INSERT INTO STUDENTS (student_id, name, email, dept_id, total_tuition) 
+VALUES (1, 'Adil Chagri', 'adil.chagri@email.com', 1, 45000);
+INSERT INTO STUDENTS (student_id, name, email, dept_id, total_tuition) 
+VALUES (2, 'Chouaib Jbel', 'chouaib.jbel@email.com', 1, 45000);
+
+COMMIT;
+
+-- 4. TRIGGER (Gestion Automatique des Paiements)
 CREATE OR REPLACE TRIGGER TRG_UPDATE_INSTALLMENT_STATUS
 FOR INSERT ON PAYMENTS
 COMPOUND TRIGGER
@@ -80,7 +103,7 @@ COMPOUND TRIGGER
 END TRG_UPDATE_INSTALLMENT_STATUS;
 /
 
--- 4. PROCEDURE (Analyse des Risques)
+-- 5. PROCEDURE (Analyse des Risques)
 CREATE OR REPLACE PROCEDURE PROC_DAILY_RISK_ANALYSIS IS
 BEGIN
     FOR r IN (
@@ -88,42 +111,41 @@ BEGIN
         FROM INSTALLMENTS
         WHERE due_date < SYSDATE AND status NOT IN ('PAID', 'OVERDUE')
     ) LOOP
-        -- Mise a jour du statut
         UPDATE INSTALLMENTS SET status = 'OVERDUE' WHERE installment_id = r.installment_id;
         
-        -- Creation de l'alerte
         INSERT INTO RISK_ALERTS (alert_id, student_id, risk_level, message)
         VALUES (
             (SELECT NVL(MAX(alert_id), 0) + 1 FROM RISK_ALERTS), 
             r.student_id, 
             'MEDIUM', 
-            'Retard detecte facture #' || r.installment_id
+            'Retard détecté facture #' || r.installment_id
         );
     END LOOP;
     COMMIT;
 END;
 /
 
--- 5. SCHEDULER JOB (Le Batch de Nuit - MANQUAIT AVANT !)
+-- 6. SCHEDULER JOB
 BEGIN
     DBMS_SCHEDULER.CREATE_JOB (
         job_name        => 'JOB_DAILY_RISK_CHECK',
         job_type        => 'PLSQL_BLOCK',
         job_action      => 'BEGIN PROC_DAILY_RISK_ANALYSIS; END;',
         start_date      => SYSTIMESTAMP,
-        repeat_interval => 'FREQ=DAILY; BYHOUR=0; BYMINUTE=0', -- Minuit tous les jours
+        repeat_interval => 'FREQ=DAILY; BYHOUR=0; BYMINUTE=0',
         enabled         => TRUE
     );
 EXCEPTION
-    WHEN OTHERS THEN NULL; -- Evite l'erreur si le job existe deja
+    WHEN OTHERS THEN NULL;
 END;
 /
 
--- 6. VUE DASHBOARD (Business Intelligence)
+-- 7. VUE DASHBOARD (Mis à jour pour inclure le département)
 CREATE OR REPLACE VIEW VIEW_RISK_DASHBOARD AS
 SELECT 
     s.student_id,
     s.name AS Student_Name,
+    d.dept_name AS Department,
     COUNT(r.alert_id) AS Total_Alerts,
     SUM(CASE WHEN i.status = 'OVERDUE' THEN i.amount_due ELSE 0 END) AS Total_Debt,
     CASE 
@@ -132,6 +154,7 @@ SELECT
         ELSE 'LOW'
     END AS Risk_Profile
 FROM STUDENTS s
+JOIN DEPARTMENTS d ON s.dept_id = d.dept_id
 LEFT JOIN INSTALLMENTS i ON s.student_id = i.student_id
 LEFT JOIN RISK_ALERTS r ON s.student_id = r.student_id
-GROUP BY s.student_id, s.name;
+GROUP BY s.student_id, s.name, d.dept_name;
