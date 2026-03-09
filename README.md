@@ -1,156 +1,131 @@
-# 🎓 Oracle Student Payment System  
-### A Modern Database-Driven Student Payment Management Platform
+# 🎓 Oracle Student Payment System
 
-![Oracle](https://img.shields.io/badge/Database-Oracle-red)
-![Python](https://img.shields.io/badge/Python-3.x-blue)
-![Streamlit](https://img.shields.io/badge/UI-Streamlit-ff4b4b)
-![PLSQL](https://img.shields.io/badge/PL%2FSQL-Advanced-green)
+![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Oracle](https://img.shields.io/badge/Oracle_DB-F80000?style=for-the-badge&logo=oracle&logoColor=white)
+![cx_Oracle](https://img.shields.io/badge/cx__Oracle-Python_Driver-F80000?style=for-the-badge)
 
----
-
-## 🚀 Overview
-
-**Oracle Student Payment System** is a full-stack academic payment management platform designed to handle **student registration, payment tracking, financial risk analysis, and automated workflows** using **Oracle Database** and **PL/SQL**, with a modern **Streamlit-based Python interface**.
-
-This project demonstrates **advanced database design**, **business logic automation**, and **real-world ERP-style architecture**, making it ideal for academic, enterprise, or portfolio use.
+> A Python-based student payment and enrollment management system powered by Oracle Database — designed for academic institutions to track tuition fees, payments, and enrollment status.
 
 ---
 
-## ✨ Key Features
+## 🎯 Overview
 
-### 👨‍🎓 Student Management
-- Register and manage student profiles
-- Track academic and financial information
-- Secure relational data modeling
-
-### 💳 Payment Processing
-- Record and validate student payments
-- Automatic payment status updates (PAID / PENDING)
-- Receipt generation logic
-
-### ⚙️ Business Logic Automation (PL/SQL)
-- Triggers to enforce data integrity
-- Stored procedures for payment workflows
-- Scheduled jobs for periodic financial checks
-
-### 📊 Risk & Monitoring Dashboard
-- Identify unpaid or late payments
-- Financial risk indicators
-- Real-time data visualization using Streamlit
-
-### 🐳 Dockerized Oracle Environment
-- Oracle 19c container for easy setup
-- Reproducible local development environment
+This system provides a complete backend for managing student financial records in a university context. It demonstrates integration between Python and Oracle DB using stored procedures, triggers, and complex query optimization.
 
 ---
 
-## 🏗️ Architecture
+## ✨ Features
 
-```
-Frontend (Streamlit - Python)
-        │
-        ▼
-Oracle Database (19c)
-        │
-        ├── Tables & Constraints
-        ├── Triggers
-        ├── Stored Procedures
-        └── Scheduled Jobs
-```
+- 📋 **Student Registration** — Enroll students with complete academic and financial profiles
+- 💰 **Payment Tracking** — Record, validate, and query tuition and fee payments
+- 📊 **Financial Reporting** — Generate summaries of paid/unpaid accounts per semester
+- 🔔 **Automated Alerts** — Oracle triggers for overdue payment notifications
+- 🔍 **Advanced Queries** — Complex SQL with joins, aggregations, and stored procedures
+- 📤 **Data Export** — Export reports to CSV for administrative use
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer        | Technology |
-|--------------|------------|
-| Database     | Oracle 19c |
-| Backend Logic| PL/SQL |
-| Frontend     | Streamlit (Python) |
-| DB Connector | python-oracledb |
-| DevOps       | Docker |
-| Language     | Python 3 |
+| Component | Technology |
+|-----------|-----------|
+| Language | Python 3.9+ |
+| Database | Oracle Database (11g+) |
+| ORM/Driver | cx_Oracle / python-oracledb |
+| Reporting | Pandas, CSV export |
 
 ---
 
-## 📂 Project Structure
+## 📁 Project Structure
 
 ```
 Oracle-Student-Payment-System/
-├── app/
-│   ├── app.py
-│   └── fix_data.py
-│
-├── database/
-│   └── setup_database.sql
-│
-├── docs/
-│   └── Rapport_Projet.pdf
-│
-├── requirements.txt
-└── README.md
+├── main.py                 # CLI entry point
+├── config.py               # DB connection config
+├── models/
+│   ├── student.py          # Student model & CRUD
+│   ├── payment.py          # Payment model & logic
+│   └── enrollment.py       # Enrollment management
+├── queries/
+│   ├── reports.sql         # Pre-built reporting queries
+│   └── procedures.sql      # Stored procedures & triggers
+├── utils/
+│   ├── db_connection.py    # Oracle connection pool
+│   └── exporter.py         # CSV/report export
+└── requirements.txt
 ```
 
 ---
 
-## ⚡ Installation & Setup
+## 🚀 Getting Started
 
-### 1️⃣ Clone the Repository
+### Prerequisites
+
 ```bash
-git clone https://github.com/Adilchagri/Oracle-Student-Payment-System.git
-cd Oracle-Student-Payment-System
+# Python dependencies
+pip install cx_Oracle pandas python-dotenv
+
+# Oracle Instant Client required
+# Download from: https://www.oracle.com/database/technologies/instant-client.html
 ```
 
-### 2️⃣ Setup Oracle Database
-- Run Oracle 19c using Docker
-- Execute `setup_database.sql` to initialize schema and logic
+### Configuration
 
-### 3️⃣ Install Python Dependencies
+```python
+# config.py
+DB_USER = "your_user"
+DB_PASSWORD = "your_password"
+DB_DSN = "localhost:1521/XEPDB1"  # or your Oracle DSN
+```
+
+### Run
+
 ```bash
-pip install -r requirements.txt
-```
-
-### 4️⃣ Run the Application
-```bash
-streamlit run app/app.py
+python main.py
 ```
 
 ---
 
-## 🎯 Use Cases
+## 🗄️ Key Database Objects
 
-- University or school payment management
-- ERP / academic system prototypes
-- Learning advanced PL/SQL & Oracle
-- Database-driven application demos
-- Backend / database portfolio project
-
----
-
-## 📈 Future Enhancements
-
-- 🔐 Authentication & role-based access
-- 📄 PDF invoice generation
-- 📊 Advanced BI dashboards
-- 🌐 REST API layer
-- ☁️ Cloud deployment (OCI / AWS)
+```sql
+-- Example: Payment status trigger
+CREATE OR REPLACE TRIGGER check_payment_deadline
+AFTER INSERT ON PAYMENTS
+FOR EACH ROW
+BEGIN
+  IF :NEW.amount < :NEW.required_amount THEN
+    -- Insert notification record
+    INSERT INTO ALERTS (student_id, message, created_at)
+    VALUES (:NEW.student_id, 'Partial payment detected', SYSDATE);
+  END IF;
+END;
+```
 
 ---
 
-## 📄 Documentation
+## 📊 Sample Queries
 
-Detailed technical documentation is available in:
-
-📘 `docs/Rapport_Projet.pdf`
+```python
+# Get all students with overdue payments
+query = """
+    SELECT s.name, s.student_id, p.due_date, p.amount_due - p.amount_paid AS balance
+    FROM STUDENTS s
+    JOIN PAYMENTS p ON s.student_id = p.student_id
+    WHERE p.due_date < SYSDATE AND p.amount_paid < p.amount_due
+    ORDER BY balance DESC
+"""
+```
 
 ---
 
-## 👨‍💻 Author
+## 👤 Author
 
-**Adil Chagri**  
-Database & Backend Enthusiast  
-Oracle • PL/SQL • Python  
+**Adil Chagri** — [github.com/Adilchagri](https://github.com/Adilchagri)
+**Jbel Chouaib** — [github.com/Adilchagri](https://github.com/choua1b)
 
 ---
 
-⭐ If you like this project, don’t forget to **star the repository**!
+## 📄 License
+
+MIT License
